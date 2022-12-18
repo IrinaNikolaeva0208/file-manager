@@ -5,8 +5,12 @@ import { readdir } from "fs";
 
 let currentDirectory = homedir();
 
-function getDir() {
+function logDir() {
     console.log("You are currently in " + currentDirectory);
+}
+
+function getDir() {
+    return currentDirectory;
 }
 
 function up() {
@@ -49,4 +53,4 @@ function ls() {
     });
 }
 
-export { getDir, up, cd, ls };
+export { logDir, up, cd, ls, getDir };
