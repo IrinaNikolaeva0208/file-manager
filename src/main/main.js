@@ -1,4 +1,5 @@
 import { getDir, up, cd, ls } from "../navigation/navigate.js";
+import { os } from "../operatingSystem/OS.js";
 
 const processArg = process.argv[2];
 const username = processArg.slice(processArg.indexOf("=") + 1);
