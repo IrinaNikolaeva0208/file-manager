@@ -1,24 +1,39 @@
 import { createBrotliCompress, createBrotliDecompress } from "zlib";
-import { createWriteStream, createReadStream } from "fs";
+import { createWriteStream, createReadStream, open } from "fs";
+import { fail } from "../main/errors.js";
 
-function compress(path_newPath) {
-    path_newPath = path_newPath.split(" ");
-    const filePath = path_newPath[0];
-    const fileNewPath = path_newPath[1];
-    const bComress = createBrotliCompress();
-    const writable = createWriteStream(fileNewPath);
-    const readable = createReadStream(filePath);
-    readable.pipe(bComress).pipe(writable);
+async function compress(path_newPath) {
+    try {
+        path_newPath = path_newPath.split(" ");
+        const filePath = path_newPath[0];
+        const fileNewPath = path_newPath[1].toString();
+        open(filePath, (err) => {
+            if (err || path_newPath[2]) fail(1);
+            else {
+                const bComress = createBrotliCompress();
+                const writable = createWriteStream(fileNewPath);
+                const readable = createReadStream(filePath);
+                readable.pipe(bComress).pipe(writable);
+            }
+        });
+    } catch (err) {
+        fail(err);
+    }
 }
 
-function decompress(path_newPath) {
+async function decompress(path_newPath) {
     path_newPath = path_newPath.split(" ");
     const filePath = path_newPath[0];
-    const fileNewPath = path_newPath[1];
-    const bComress = createBrotliDecompress();
-    const writable = createWriteStream(fileNewPath);
-    const readable = createReadStream(filePath);
-    readable.pipe(bComress).pipe(writable);
+    const fileNewPath = path_newPath[1].toString();
+    open(filePath, (err) => {
+        if (err || path_newPath[2]) fail(1);
+        else {
+            const bComress = createBrotliCompress();
+            const writable = createWriteStream(fileNewPath);
+            const readable = createReadStream(filePath);
+            readable.pipe(bComress).pipe(writable);
+        }
+    });
 }
 
 export { compress, decompress };

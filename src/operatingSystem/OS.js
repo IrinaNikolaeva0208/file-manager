@@ -1,4 +1,5 @@
 import OS from "os";
+import { invalid } from "../main/errors.js";
 
 function os(args) {
     const flag = args.slice(2);
@@ -22,6 +23,7 @@ function os(args) {
             console.log(OS.arch());
             break;
         default:
+            invalid();
     }
 }
 

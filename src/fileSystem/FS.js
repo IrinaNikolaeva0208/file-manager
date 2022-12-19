@@ -1,45 +1,51 @@
 import fs from "fs";
 import path from "path";
 import { getDir } from "../navigation/navigate.js";
+import { fail } from "../main/errors.js";
 
-function cat(path) {
-    const readable = fs.createReadStream(path, { encoding: "utf-8" });
-    readable.on("data", (chunk) => console.log(chunk));
+async function cat(path) {
+    try {
+        const readable = fs.createReadStream(path, { encoding: "utf-8" });
+        readable.on("data", (chunk) => console.log(chunk));
+    } catch (err) {
+        fail(err);
+    }
 }
 
-function rn(path_newPath) {
+async function rn(path_newPath) {
     path_newPath = path_newPath.split(" ");
     const filePath = path_newPath[0];
     const newFileName = path_newPath[1];
-    fs.rename(filePath, newFileName, (err) => {
-        if (err) console.log("error");
-    });
+    fs.rename(filePath, newFileName, (err) => fail(err));
 }
 
-function rm(path) {
-    console.log(path);
-    fs.rm(path, { recursive: true }, (err) => {
-        if (err) console.log(err);
-    });
+async function rm(path) {
+    fs.rm(path, { recursive: true }, (err) => fail(err));
 }
 
-function add(fileName) {
-    fs.open(path.join(getDir(), fileName), "w", (err) => {
-        if (err) console.log("error");
-    });
+async function add(fileName) {
+    fs.open(path.join(getDir(), fileName), "w", (err) => fail(err));
 }
 
-function cp(path_newPath) {
-    //rewrite using streams
-    path_newPath = path_newPath.split(" ");
-    const dirPath = path_newPath[0];
-    const newDirPath = path_newPath[1];
-    fs.cp(dirPath, newDirPath, { recursive: true }, (err) => {
-        if (err) console.log(err);
-    });
+async function cp(path_newPath) {
+    try {
+        path_newPath = path_newPath.split(" ");
+        const filePath = path_newPath[0];
+        const newFilePath = path_newPath[1].toString();
+        fs.open(filePath, (err) => {
+            if (err) fail(err);
+            else {
+                const readable = fs.createReadStream(filePath);
+                const writable = fs.createWriteStream(newFilePath);
+                readable.pipe(writable);
+            }
+        });
+    } catch (err) {
+        fail(err);
+    }
 }
 
-function mv(path_newPath) {
+async function mv(path_newPath) {
     cp(path_newPath);
     rm(path_newPath.split(" ")[0]);
 }
