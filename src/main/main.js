@@ -3,6 +3,7 @@ import { logDir, up, cd, ls } from "../navigation/navigate.js";
 import { os } from "../operatingSystem/OS.js";
 import { cat, rn, rm, add, cp, mv } from "../fileSystem/FS.js";
 import { hash } from "../hash/calcHash.js";
+import { compress, decompress } from "../zip/ZipOperations.js";
 
 const processArg = process.argv[2];
 const username = processArg.slice(processArg.indexOf("=") + 1);
@@ -19,7 +20,6 @@ readable.on("data", (chunk) => {
     const command = result.slice(0, result.indexOf(" ") || result.length - 1);
     const args = result.slice(result.indexOf(" ") + 1).trim();
     eval(`${command}(args)`);
-    //spawn(command, [args]);
     logDir();
     if (result.match(".exit")) process.emit("SIGINT");
 });
