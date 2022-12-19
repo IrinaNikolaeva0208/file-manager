@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import { logDir, up, cd, ls } from "../navigation/navigate.js";
 import { os } from "../operatingSystem/OS.js";
 import { cat, rn, rm, add, cp, mv } from "../fileSystem/FS.js";
+import { hash } from "../hash/calcHash.js";
 
 const processArg = process.argv[2];
 const username = processArg.slice(processArg.indexOf("=") + 1);
