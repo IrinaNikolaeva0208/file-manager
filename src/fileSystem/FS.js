@@ -3,9 +3,10 @@ import path from "path";
 import { getDir } from "../navigation/navigate.js";
 import { fail } from "../main/errors.js";
 
-async function cat(path) {
+async function cat(filePath) {
+    if (!path.isAbsolute(filePath)) filePath = path.resolve(getDir(), filePath);
     try {
-        const readable = fs.createReadStream(path, { encoding: "utf-8" });
+        const readable = fs.createReadStream(filePath, { encoding: "utf-8" });
         readable.on("data", (chunk) => console.log(chunk));
     } catch (err) {
         fail(err);
@@ -14,30 +15,42 @@ async function cat(path) {
 
 async function rn(path_newPath) {
     path_newPath = path_newPath.split(" ");
-    const filePath = path_newPath[0];
-    const newFileName = path_newPath[1];
+    let filePath = path_newPath[0];
+    if (!path.isAbsolute(filePath)) filePath = path.resolve(getDir(), filePath);
+    let newFileName = path_newPath[1];
+    if (!path.isAbsolute(newFileName))
+        newFileName = path.resolve(getDir(), newFileName);
     fs.rename(filePath, newFileName, (err) => fail(err));
 }
 
-async function rm(path) {
-    fs.rm(path, { recursive: true }, (err) => fail(err));
+async function rm(filePath) {
+    if (!path.isAbsolute(filePath)) filePath = path.resolve(getDir(), filePath);
+    fs.rm(filePath, { recursive: true }, (err) => fail(err));
 }
 
 async function add(fileName) {
-    fs.open(path.join(getDir(), fileName), "w", (err) => fail(err));
+    if (!path.isAbsolute(fileName)) fileName = path.resolve(getDir(), fileName);
+    fs.open(fileName, "w", (err) => fail(err));
 }
 
 async function cp(path_newPath) {
     try {
         path_newPath = path_newPath.split(" ");
-        const filePath = path_newPath[0];
-        const newFilePath = path_newPath[1].toString();
+        let filePath = path_newPath[0];
+        if (!path.isAbsolute(filePath))
+            filePath = path.resolve(getDir(), filePath);
+        let newFilePath = path_newPath[1].toString();
+        if (!path.isAbsolute(newFilePath))
+            newFilePath = path.resolve(getDir(), newFilePath);
         fs.open(filePath, (err) => {
             if (err) fail(err);
             else {
                 const readable = fs.createReadStream(filePath);
-                const writable = fs.createWriteStream(newFilePath);
-                readable.pipe(writable);
+                fs.open(newFilePath, "w", (err) => {
+                    if (err) fail(err);
+                    const writable = fs.createWriteStream(newFilePath);
+                    readable.pipe(writable);
+                });
             }
         });
     } catch (err) {
