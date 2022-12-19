@@ -1,7 +1,7 @@
 import fs from "fs";
-import path from "path";
-import { getDir } from "../navigation/navigate.js";
 import { fail } from "../main/errors.js";
+import { getDir } from "../navigation/navigate.js";
+import path from "path";
 
 async function cat(filePath) {
     if (!path.isAbsolute(filePath)) filePath = path.resolve(getDir(), filePath);
